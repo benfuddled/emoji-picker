@@ -92,7 +92,7 @@ fn show_content<'a>(happiness_level: f32, show_it: bool, search_val: &str) -> El
 
 fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) -> Element<'a, Message> {
     let rocket = emojis::get("🚀").unwrap();
-    //let stars = emojis::get("🤩").unwrap();
+    let stars = emojis::get("🤩").unwrap();
     //let grape = emojis::get("🍇").unwrap();
     let text_thing = text(rocket).size(happiness_level).shaping(text::Shaping::Advanced);
     let mut col = Column::new().push(text_thing);
