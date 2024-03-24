@@ -113,9 +113,13 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
     //     }
     // }
 
-    // Collect iter into vector so we can break it into chunks for each row.
-    let mut moji_rows = emojis::iter().filter(|e| e.unicode_version() < emojis::UnicodeVersion::new(13, 0)).collect::<Vec<_>>();
-    for moji_row in moji_rows.chunks(10) {
+    // Library recommends to filter the list by the maximum Unicode version that you wish to support.
+    let minimum_moji = emojis::iter().filter(|e| e.unicode_version() < emojis::UnicodeVersion::new(13, 0)).collect::<Vec<_>>();
+    // Only render emoji that match name.
+    let filtered_moji = minimum_moji.iter().filter(|e| e.name().contains(search_val)).collect::<Vec<_>>();
+
+    // We collected iter into vector so we can break it into chunks for each row.
+    for moji_row in filtered_moji.chunks(10) {
         let mut row: Row<Message> = Row::new();
         for moji in moji_row {
             if search_val.len() <= 0 {
