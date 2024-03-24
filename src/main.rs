@@ -2,15 +2,12 @@ use iced::{Alignment, alignment, Background, Border, clipboard, Color, executor,
 use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text, button, Container, Button};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
-use iced::alignment::Horizontal;
 use iced::widget::container::Appearance;
-use iced::widget::rule::StyleSheet;
-use iced::widget::Slider;
 
 pub fn main() -> iced::Result {
     Picker::run(Settings {
         window: window::Settings {
-            size: Size { width: (550.0), height: (500.0) },
+            size: Size { width: (530.0), height: (600.0) },
             position: Default::default(),
             min_size: None,
             max_size: None,
@@ -49,14 +46,14 @@ impl Application for Picker {
 
     fn new(_flags: ()) -> (Picker, Command<Self::Message>) {
         (Picker {
-            happiness_level: 20.0,
+            happiness_level: 24.0,
             show_it: false,
             search_val: String::from("")
         }, Command::none())
     }
 
     fn title(&self) -> String {
-        String::from("Picker")
+        String::from("Emoji Picker")
     }
 
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
@@ -153,14 +150,14 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
         for moji in moji_row {
             let txt = text(moji).size(happiness_level).shaping(text::Shaping::Advanced);
             let txt_container = Container::new(txt).center_x().width(iced::Length::Fill);
-            let btn = Button::new(txt_container).on_press(Message::EmojiPressed(String::from(moji.as_str()))).width(Pixels(80.0));
-            let btn_container = Container::new(btn).center_x().width(Pixels(80.0));
+            let btn = Button::new(txt_container).on_press(Message::EmojiPressed(String::from(moji.as_str()))).width(Pixels(75.0));
+            let btn_container = Container::new(btn).center_x().width(Pixels(75.0));
             // row = row.push(button(txt_container)
             //     .on_press(Message::EmojiPressed(String::from(moji.as_str()))));
 
             row = row.push(btn_container);
         }
-        let row_holder = Container::new(row).center_x().align_x(alignment::Horizontal::Center).style(container_theme()).width(Length::Fill);
+        let row_holder = Container::new(row).center_x().align_x(alignment::Horizontal::Center).width(Length::Fixed(520.0));
         col = col.push(row_holder);
     }
 
@@ -168,6 +165,7 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
 }
 
 // create the theme
+// call .style(container_theme()) on any container for layout debugging.
 // via https://discord.com/channels/628993209984614400/1213838081103237180/1213838081103237180
 fn container_theme() -> Appearance {
     Appearance {
