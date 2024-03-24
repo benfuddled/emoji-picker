@@ -1,5 +1,5 @@
-use iced::executor;
-use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable};
+use iced::{Alignment, executor};
+use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
 use iced::widget::Slider;
@@ -103,14 +103,28 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
     //     col = col.push(text(grape).size(happiness_level).shaping(text::Shaping::Advanced));
     // }
 
-    let mojis = emojis::iter().filter(|e| e.unicode_version() < emojis::UnicodeVersion::new(13, 0));
+    // let mojis = emojis::iter().filter(|e| e.unicode_version() < emojis::UnicodeVersion::new(13, 0));
+    //
+    // for e in mojis {
+    //     if search_val.len() <= 0 {
+    //         col = col.push(text(e).size(happiness_level).shaping(text::Shaping::Advanced));
+    //     } else if e.name().contains(search_val) {
+    //         col = col.push(text(e).size(happiness_level).shaping(text::Shaping::Advanced));
+    //     }
+    // }
 
-    for e in mojis {
-        if search_val.len() <= 0 {
-            col = col.push(text(e).size(happiness_level).shaping(text::Shaping::Advanced));
-        } else if e.name().contains(search_val) {
-            col = col.push(text(e).size(happiness_level).shaping(text::Shaping::Advanced));
+    // Collect iter into vector so we can break it into chunks for each row.
+    let mut moji_rows = emojis::iter().filter(|e| e.unicode_version() < emojis::UnicodeVersion::new(13, 0)).collect::<Vec<_>>();
+    for moji_row in moji_rows.chunks(10) {
+        let mut row: Row<Message> = Row::new();
+        for moji in moji_row {
+            if search_val.len() <= 0 {
+                row = row.push(text(moji).size(happiness_level).shaping(text::Shaping::Advanced));
+            } else if moji.name().contains(search_val) {
+                row = row.push(text(moji).size(happiness_level).shaping(text::Shaping::Advanced));
+            }
         }
+        col = col.push(row);
     }
 
     col.into()
