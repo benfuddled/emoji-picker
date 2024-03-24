@@ -1,7 +1,9 @@
-use iced::{Alignment, clipboard, executor, Length};
+use iced::{Alignment, alignment, Background, Border, clipboard, Color, executor, Length, Padding, Pixels, Shadow, Vector};
 use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text, button, Container};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
+use iced::widget::container::Appearance;
+use iced::widget::rule::StyleSheet;
 use iced::widget::Slider;
 
 pub fn main() -> iced::Result {
@@ -72,7 +74,7 @@ impl Application for Picker {
         );
         let text_input = text_input("search!!", &*self.search_val).on_input(Message::SearchInput);
         let show_two = checkbox("show two", self.show_it).on_toggle(Message::ToggleTwo);
-        let column = column![show_content_grid(self.happiness_level, self.show_it, &self.search_val), show_two, text(self.happiness_level), happiness_slider];
+        let column = column![show_content_grid(self.happiness_level, self.show_it, &self.search_val), show_two, text(self.happiness_level), happiness_slider].width(Length::Fill);
         let scroll_me = Scrollable::new(column).height(Length::Fill);
 
         let scroll_container = Container::new(scroll_me).height(Length::Fill);
@@ -105,7 +107,7 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
     let stars = emojis::get("🤩").unwrap();
     //let grape = emojis::get("🍇").unwrap();
     let text_thing = text(rocket).size(happiness_level).shaping(text::Shaping::Advanced);
-    let mut col = Column::new().push(text_thing);
+    let mut col = Column::new().push(text_thing).width(Length::Fill);
     // if show_it == true {
     //     col = col.push(text(stars).size(happiness_level).shaping(text::Shaping::Advanced));
     // }
@@ -129,17 +131,41 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
     let filtered_moji = minimum_moji.iter().filter(|e| e.name().contains(search_val)).collect::<Vec<_>>();
 
     // We collected iter into vector so we can break it into chunks for each row.
-    for moji_row in filtered_moji.chunks(10) {
-        let mut row: Row<Message> = Row::new();
+    for moji_row in filtered_moji.chunks(8) {
+        let mut row: Row<Message> = Row::new().padding(4).spacing(8).align_items(Alignment::End);
         for moji in moji_row {
             let txt = text(moji).size(happiness_level).shaping(text::Shaping::Advanced);
-            let container = Container::new(txt).center_x();
-            row = row.push(button(container)
-                .width(iced::Length::Fill)
-                .on_press(Message::EmojiPressed(String::from(moji.as_str()))));
+            let txt_container = Container::new(txt).center_x().width(iced::Length::Fill);
+            let btn_container = Container::new(button(txt_container).on_press(Message::EmojiPressed(String::from(moji.as_str()))).width(Pixels(80.0)))
+                .max_width(Pixels(80.0))
+                .center_x();
+            // row = row.push(button(txt_container)
+            //     .on_press(Message::EmojiPressed(String::from(moji.as_str()))));
+
+            row = row.push(btn_container);
         }
-        col = col.push(row);
+        let row_holder = Container::new(row).center_x().align_x(alignment::Horizontal::Center).style(container_theme()).width(Length::Fill);
+        col = col.push(row_holder);
     }
 
     col.into()
+}
+
+// create the theme
+// via https://discord.com/channels/628993209984614400/1213838081103237180/1213838081103237180
+fn container_theme() -> Appearance {
+    Appearance {
+        border: Border {
+            width: 2.0,
+            color: Color::BLACK,
+            ..Border::default()
+        },
+        background: Some(Background::Color(Color::from_rgb(0.0, 0.0, 0.0))),
+        shadow: Shadow {
+            color: Color::from_rgb(0.0, 0.0, 0.0),
+            offset: Vector::new(0.0, 8.0),
+            blur_radius: 2.0,
+        },
+        ..Appearance::default()
+    }
 }
