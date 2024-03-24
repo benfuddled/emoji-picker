@@ -1,4 +1,4 @@
-use iced::{Alignment, clipboard, executor};
+use iced::{Alignment, clipboard, executor, Length};
 use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text, button};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
@@ -127,11 +127,9 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
     for moji_row in filtered_moji.chunks(10) {
         let mut row: Row<Message> = Row::new();
         for moji in moji_row {
-            if search_val.len() <= 0 {
-                row = row.push(button(text(moji).size(happiness_level).shaping(text::Shaping::Advanced)).on_press(Message::EmojiPressed(String::from(moji.as_str()))),);
-            } else if moji.name().contains(search_val) {
-                row = row.push(text(moji).size(happiness_level).shaping(text::Shaping::Advanced));
-            }
+            row = row.push(button(text(moji).size(happiness_level).shaping(text::Shaping::Advanced))
+                .width(iced::Length::Fill)
+                .on_press(Message::EmojiPressed(String::from(moji.as_str()))));
         }
         col = col.push(row);
     }
