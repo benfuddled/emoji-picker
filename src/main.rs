@@ -1,13 +1,12 @@
-use iced::{Alignment, alignment, Background, Border, clipboard, Color, executor, Length, Padding, Pixels, Shadow, Size, Vector, window};
-use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text, button, Container, Button};
+use iced::{alignment, Background, Border, clipboard, Color, executor, Length, Padding, Pixels, Shadow, Size, Vector, widget, window};
+use iced::widget::{column, container, text, Column, text_input, Scrollable, Row, Container, Button};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
-use iced::widget::container::Appearance;
 
 pub fn main() -> iced::Result {
     Picker::run(Settings {
         window: window::Settings {
-            size: Size { width: (530.0), height: (600.0) },
+            size: Size { width: (450.0), height: (540.0) },
             position: Default::default(),
             min_size: None,
             max_size: None,
@@ -82,12 +81,12 @@ fn show_content_grid<'a>(search_val: &str) -> Element<'a, Message> {
     let mut col = Column::new();
 
     // Library recommends to filter the list by the maximum Unicode version that you wish to support.
-    let minimum_moji = emojis::iter().filter(|e| e.unicode_version() < emojis::UnicodeVersion::new(13, 0)).collect::<Vec<_>>();
+    let minimum_moji = emojis::iter().filter(|e| e.unicode_version() < emojis::UnicodeVersion::new(15, 1)).collect::<Vec<_>>();
     // Only render emoji that match name.
     let filtered_moji = minimum_moji.iter().filter(|e| e.name().contains(search_val)).collect::<Vec<_>>();
 
-    // We collected iter into vector so we can break it into chunks for each row.
-    for moji_row in filtered_moji.chunks(6) {
+    // We collected iter into vector, so we can break it into chunks for each row.
+    for moji_row in filtered_moji.chunks(5) {
         let mut row: Row<Message> = Row::new().padding(4).spacing(8);
         for moji in moji_row {
             let txt = text(moji).size(24.0).shaping(text::Shaping::Advanced);
@@ -97,7 +96,7 @@ fn show_content_grid<'a>(search_val: &str) -> Element<'a, Message> {
 
             row = row.push(btn_container);
         }
-        let row_holder = Container::new(row).center_x().align_x(alignment::Horizontal::Center).width(Length::Fixed(520.0));
+        let row_holder = Container::new(row).center_x().align_x(alignment::Horizontal::Center).width(Length::Fixed(440.0));
         col = col.push(row_holder);
     }
 
@@ -107,8 +106,8 @@ fn show_content_grid<'a>(search_val: &str) -> Element<'a, Message> {
 // create the theme
 // call .style(container_theme()) on any container for layout debugging.
 // via https://discord.com/channels/628993209984614400/1213838081103237180/1213838081103237180
-fn container_theme() -> Appearance {
-    Appearance {
+fn container_theme() -> widget::container::Appearance {
+    widget::container::Appearance {
         border: Border {
             width: 2.0,
             color: Color::BLACK,
@@ -120,6 +119,6 @@ fn container_theme() -> Appearance {
             offset: Vector::new(0.0, 8.0),
             blur_radius: 2.0,
         },
-        ..Appearance::default()
+        ..widget::container::Appearance::default()
     }
 }
