@@ -1,5 +1,5 @@
 use iced::{Alignment, clipboard, executor, Length};
-use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text, button};
+use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text, button, Container};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
 use iced::widget::Slider;
@@ -127,7 +127,9 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
     for moji_row in filtered_moji.chunks(10) {
         let mut row: Row<Message> = Row::new();
         for moji in moji_row {
-            row = row.push(button(text(moji).size(happiness_level).shaping(text::Shaping::Advanced))
+            let txt = text(moji).size(happiness_level).shaping(text::Shaping::Advanced);
+            let container = Container::new(txt).center_x();
+            row = row.push(button(container)
                 .width(iced::Length::Fill)
                 .on_press(Message::EmojiPressed(String::from(moji.as_str()))));
         }
