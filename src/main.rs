@@ -1,5 +1,5 @@
-use iced::{Alignment, executor};
-use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text};
+use iced::{Alignment, clipboard, executor};
+use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text, button};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
 use iced::widget::Slider;
@@ -18,7 +18,8 @@ struct Picker {
 enum Message {
     HappinessLevelChanged(u8),
     ToggleTwo(bool),
-    SearchInput(String)
+    SearchInput(String),
+    EmojiPressed(String)
 }
 
 impl Application for Picker {
@@ -29,7 +30,7 @@ impl Application for Picker {
 
     fn new(_flags: ()) -> (Picker, Command<Self::Message>) {
         (Picker {
-            happiness_level: 10.0,
+            happiness_level: 20.0,
             show_it: false,
             search_val: String::from("")
         }, Command::none())
@@ -55,6 +56,10 @@ impl Application for Picker {
                 self.search_val = input;
                 println!("{}", self.search_val);
                 Command::none()
+            }
+            Message::EmojiPressed(input) => {
+                println!("{}", input);
+                return clipboard::write(input);
             }
         }
     }
@@ -123,7 +128,7 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
         let mut row: Row<Message> = Row::new();
         for moji in moji_row {
             if search_val.len() <= 0 {
-                row = row.push(text(moji).size(happiness_level).shaping(text::Shaping::Advanced));
+                row = row.push(button(text(moji).size(happiness_level).shaping(text::Shaping::Advanced)).on_press(Message::EmojiPressed(String::from(moji.as_str()))),);
             } else if moji.name().contains(search_val) {
                 row = row.push(text(moji).size(happiness_level).shaping(text::Shaping::Advanced));
             }
