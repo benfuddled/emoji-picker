@@ -1,13 +1,30 @@
-use iced::{Alignment, alignment, Background, Border, clipboard, Color, executor, Length, Padding, Pixels, Shadow, Vector};
-use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text, button, Container};
+use iced::{Alignment, alignment, Background, Border, clipboard, Color, executor, Length, Padding, Pixels, Shadow, Size, Vector, window};
+use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable, Row, Text, button, Container, Button};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
+use iced::alignment::Horizontal;
 use iced::widget::container::Appearance;
 use iced::widget::rule::StyleSheet;
 use iced::widget::Slider;
 
 pub fn main() -> iced::Result {
-    Picker::run(Settings::default())
+    Picker::run(Settings {
+        window: window::Settings {
+            size: Size { width: (550.0), height: (500.0) },
+            position: Default::default(),
+            min_size: None,
+            max_size: None,
+            visible: true,
+            resizable: false,
+            decorations: true,
+            transparent: false,
+            level: Default::default(),
+            icon: None,
+            platform_specific: Default::default(),
+            exit_on_close_request: true,
+        },
+        ..Default::default() // Noob note: Makes the rest of the settings the struct default.
+    })
 }
 
 struct Picker {
@@ -131,14 +148,13 @@ fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) 
     let filtered_moji = minimum_moji.iter().filter(|e| e.name().contains(search_val)).collect::<Vec<_>>();
 
     // We collected iter into vector so we can break it into chunks for each row.
-    for moji_row in filtered_moji.chunks(8) {
-        let mut row: Row<Message> = Row::new().padding(4).spacing(8).align_items(Alignment::End);
+    for moji_row in filtered_moji.chunks(6) {
+        let mut row: Row<Message> = Row::new().padding(4).spacing(8);
         for moji in moji_row {
             let txt = text(moji).size(happiness_level).shaping(text::Shaping::Advanced);
             let txt_container = Container::new(txt).center_x().width(iced::Length::Fill);
-            let btn_container = Container::new(button(txt_container).on_press(Message::EmojiPressed(String::from(moji.as_str()))).width(Pixels(80.0)))
-                .max_width(Pixels(80.0))
-                .center_x();
+            let btn = Button::new(txt_container).on_press(Message::EmojiPressed(String::from(moji.as_str()))).width(Pixels(80.0));
+            let btn_container = Container::new(btn).center_x().width(Pixels(80.0));
             // row = row.push(button(txt_container)
             //     .on_press(Message::EmojiPressed(String::from(moji.as_str()))));
 
