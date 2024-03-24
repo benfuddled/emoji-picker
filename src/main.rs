@@ -72,11 +72,16 @@ impl Application for Picker {
         );
         let text_input = text_input("search!!", &*self.search_val).on_input(Message::SearchInput);
         let show_two = checkbox("show two", self.show_it).on_toggle(Message::ToggleTwo);
-        let column = column![text_input, show_content_grid(self.happiness_level, self.show_it, &self.search_val), show_two, text(self.happiness_level), happiness_slider];
-        let scroll_me = Scrollable::new(column);
+        let column = column![show_content_grid(self.happiness_level, self.show_it, &self.search_val), show_two, text(self.happiness_level), happiness_slider];
+        let scroll_me = Scrollable::new(column).height(Length::Fill);
+
+        let scroll_container = Container::new(scroll_me).height(Length::Fill);
+        let text_container = Container::new(text_input);
+
+        let window_column = column![text_container, scroll_container];
         // container(column).padding(20).center_x().center_y().into()
         //let column = column![show_content(self.happiness_level)];
-        container(scroll_me).into()
+        container(window_column).into()
     }
 }
 
