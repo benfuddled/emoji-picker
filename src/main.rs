@@ -3,6 +3,8 @@ use iced::widget::{column, container, text, Column, text_input, Scrollable, Row,
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
 
+// TODO: Load custom font, see https://github.com/iced-rs/iced_aw/blob/main/examples/color_picker/src/main.rs#L50
+
 pub fn main() -> iced::Result {
     Picker::run(Settings {
         window: window::Settings {
