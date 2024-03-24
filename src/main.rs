@@ -1,5 +1,5 @@
 use iced::executor;
-use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input};
+use iced::widget::{column, container, slider, text, vertical_space, Column, checkbox, text_input, Scrollable};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
 use iced::widget::Slider;
@@ -67,10 +67,11 @@ impl Application for Picker {
         );
         let text_input = text_input("search!!", &*self.search_val).on_input(Message::SearchInput);
         let show_two = checkbox("show two", self.show_it).on_toggle(Message::ToggleTwo);
-        let column = column![text_input, show_content(self.happiness_level, self.show_it, &self.search_val), show_two, text(self.happiness_level), happiness_slider];
+        let column = column![text_input, show_content_grid(self.happiness_level, self.show_it, &self.search_val), show_two, text(self.happiness_level), happiness_slider];
+        let scroll_me = Scrollable::new(column);
         // container(column).padding(20).center_x().center_y().into()
         //let column = column![show_content(self.happiness_level)];
-        container(column).into()
+        container(scroll_me).into()
     }
 }
 
@@ -86,5 +87,31 @@ fn show_content<'a>(happiness_level: f32, show_it: bool, search_val: &str) -> El
     if search_val == "grape" {
         col = col.push(text(grape).size(happiness_level).shaping(text::Shaping::Advanced));
     }
+    col.into()
+}
+
+fn show_content_grid<'a>(happiness_level: f32, show_it: bool, search_val: &str) -> Element<'a, Message> {
+    let rocket = emojis::get("🚀").unwrap();
+    //let stars = emojis::get("🤩").unwrap();
+    //let grape = emojis::get("🍇").unwrap();
+    let text_thing = text(rocket).size(happiness_level).shaping(text::Shaping::Advanced);
+    let mut col = Column::new().push(text_thing);
+    // if show_it == true {
+    //     col = col.push(text(stars).size(happiness_level).shaping(text::Shaping::Advanced));
+    // }
+    // if search_val == "grape" {
+    //     col = col.push(text(grape).size(happiness_level).shaping(text::Shaping::Advanced));
+    // }
+
+    let mojis = emojis::iter().filter(|e| e.unicode_version() < emojis::UnicodeVersion::new(13, 0));
+
+    for e in mojis {
+        if search_val.len() <= 0 {
+            col = col.push(text(e).size(happiness_level).shaping(text::Shaping::Advanced));
+        } else if e.name().contains(search_val) {
+            col = col.push(text(e).size(happiness_level).shaping(text::Shaping::Advanced));
+        }
+    }
+
     col.into()
 }
