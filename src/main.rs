@@ -1,9 +1,9 @@
-use iced::{alignment, Background, Border, clipboard, Color, executor, Length, Padding, Pixels, Shadow, Size, Vector, widget, window};
+use iced::{alignment, Background, Border, clipboard, Color, executor, Font, font, Length, Padding, Pixels, Shadow, Size, Vector, widget, window};
 use iced::widget::{column, container, text, Column, text_input, Scrollable, Row, Container, Button};
 use iced::{Application, Command, Element, Settings, Theme};
 use emojis;
 
-// TODO: Load custom font, see https://github.com/iced-rs/iced_aw/blob/main/examples/color_picker/src/main.rs#L50
+const EMOJI_FONT_FAMILY: iced::Font = iced::Font::with_name("Noto Color Emoji");
 
 pub fn main() -> iced::Result {
     Picker::run(Settings {
@@ -32,7 +32,8 @@ struct Picker {
 #[derive(Debug, Clone)]
 enum Message {
     SearchInput(String),
-    EmojiPressed(String)
+    EmojiPressed(String),
+    FontLoaded(Result<(), font::Error>),
 }
 
 impl Application for Picker {
@@ -44,7 +45,9 @@ impl Application for Picker {
     fn new(_flags: ()) -> (Picker, Command<Self::Message>) {
         (Picker {
             search_val: String::from("")
-        }, Command::none())
+        }, Command::batch([
+            font::load(include_bytes!("../res/NotoColorEmoji-Regular.ttf").as_slice()).map(Message::FontLoaded)
+        ]))
     }
 
     fn title(&self) -> String {
@@ -53,6 +56,9 @@ impl Application for Picker {
 
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
+            Message::FontLoaded(_) => {
+                Command::none()
+            }
             Message::SearchInput(input) => {
                 self.search_val = input;
                 println!("{}", self.search_val);
@@ -91,7 +97,7 @@ fn show_content_grid<'a>(search_val: &str) -> Element<'a, Message> {
     for moji_row in filtered_moji.chunks(5) {
         let mut row: Row<Message> = Row::new().padding(4).spacing(8);
         for moji in moji_row {
-            let txt = text(moji).size(24.0).shaping(text::Shaping::Advanced);
+            let txt = text(moji).size(24.0).font(EMOJI_FONT_FAMILY).shaping(text::Shaping::Advanced);
             let txt_container = Container::new(txt).center_x().width(iced::Length::Fill);
             let btn = Button::new(txt_container).on_press(Message::EmojiPressed(String::from(moji.as_str()))).width(Pixels(75.0));
             let btn_container = Container::new(btn).center_x().width(Pixels(75.0));
